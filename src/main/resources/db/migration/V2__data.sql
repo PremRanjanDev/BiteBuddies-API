@@ -6,9 +6,6 @@ values
 
 INSERT INTO sessions (name, description, event_date, initiated_by)
 values
-('New Year', 'Lets celebrate new year 2024', CURRENT_DATE, 1);
-('Johns Birthday', 'Lets celebrate Johns Birthday', CURRENT_DATE, 1),
-('Release Celebration', 'Lets celebrate our last release', CURRENT_DATE, 1);
-
-
---COMMIT;
+('New Year', 'Lets celebrate new year 2024', CURRENT_DATE, 1),
+('Johns Birthday', 'Lets celebrate Johns Birthday', CURRENT_DATE, 2),
+('Release Celebration', 'Lets celebrate our last release', CURRENT_DATE, 3);
