@@ -16,11 +16,12 @@ CREATE TABLE sessions (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description VARCHAR(255),
-  event_date DATE,
+  starts_at TIMESTAMP,
   initiated_by INT NOT NULL REFERENCES users(id),
   picked_restaurant_id INT REFERENCES restaurants(id),
-  visibility VARCHAR(10) DEFAULT 'Private' CHECK (visibility IN ('Public', 'Private')),
   active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  deleted BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP
 );
 
