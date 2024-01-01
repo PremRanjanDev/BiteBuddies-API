@@ -4,12 +4,15 @@ import com.bitebuddies.dao.SessionEntity;
 import com.bitebuddies.dto.SessionDto;
 import org.mapstruct.*;
 
+import java.util.Collection;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        uses = {UserMapper.class, SessionUserMapper.class},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SessionMapper {
     SessionDto map(SessionEntity entity);
-    List<SessionDto> map(List<SessionEntity> entities);
+    Collection<SessionDto> map(Collection<SessionEntity> entities);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "active", ignore = true)

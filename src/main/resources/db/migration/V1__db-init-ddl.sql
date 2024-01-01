@@ -25,3 +25,17 @@ CREATE TABLE sessions (
   updated_at TIMESTAMP
 );
 
+CREATE TABLE session_restaurants (
+  session_id INT NOT NULL REFERENCES sessions(id),
+  restaurant_id INT NOT NULL REFERENCES restaurants(id),
+  PRIMARY KEY (session_id, restaurant_id)
+);
+
+CREATE TABLE session_users (
+  session_id INT NOT NULL REFERENCES sessions(id),
+  user_id INT NOT NULL REFERENCES users(id),
+  status VARCHAR(10) NOT NULL DEFAULT 'invited' CHECK (status IN ('invited', 'joined')),
+  invited_at TIMESTAMP,
+  joined_at TIMESTAMP,
+  PRIMARY KEY (session_id, user_id)
+);

@@ -1,10 +1,12 @@
 package com.bitebuddies.controller;
 
 import com.bitebuddies.dto.SessionDto;
+import com.bitebuddies.dto.UserDto;
 import com.bitebuddies.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -14,32 +16,40 @@ public class SessionController {
     private SessionService sessionService;
 
     @GetMapping("/all")
-    public List<SessionDto> getAllSessions(){
+    public Collection<SessionDto> getAllSessions() {
         return sessionService.getAllSessions();
     }
 
     @GetMapping("/active")
-    public List<SessionDto> getActiveSessions(){
+    public Collection<SessionDto> getActiveSessions() {
         return sessionService.getActiveSessions();
     }
 
     @GetMapping("/{id}")
-    public SessionDto getSession(@PathVariable Long id){
+    public SessionDto getSession(@PathVariable Long id) {
         return sessionService.getSession(id);
     }
 
     @PostMapping
-    public SessionDto createSession(@RequestBody SessionDto req){
+    public SessionDto createSession(@RequestBody SessionDto req) {
         return sessionService.createSession(req);
     }
-    
+
     @PutMapping
-    public SessionDto updateSession(@RequestBody SessionDto req){
+    public SessionDto updateSession(@RequestBody SessionDto req) {
         return sessionService.updateSession(req);
     }
 
+    @PutMapping("/{id}/invite")
+    public SessionDto invite(@PathVariable Long id, @RequestBody List<Long> userIds) {
+        return sessionService.invite(id, userIds);
+    }
+
+
+
+
     @DeleteMapping("/{id}")
-    public void deleteSession(@PathVariable Long id){
+    public void deleteSession(@PathVariable Long id) {
         sessionService.deleteSession(id);
     }
 }
