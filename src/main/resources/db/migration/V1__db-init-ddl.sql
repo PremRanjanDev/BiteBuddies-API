@@ -1,8 +1,8 @@
 CREATE TABLE restaurants (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(255) UNIQUE,
   location VARCHAR(255),
-  imageUrl VARCHAR(255)
+  image_url VARCHAR(255)
 );
 
 CREATE TABLE users (
@@ -28,6 +28,7 @@ CREATE TABLE sessions (
 CREATE TABLE session_restaurants (
   session_id INT NOT NULL REFERENCES sessions(id),
   restaurant_id INT NOT NULL REFERENCES restaurants(id),
+  submitted_by INT NOT NULL REFERENCES users(id),
   PRIMARY KEY (session_id, restaurant_id)
 );
 

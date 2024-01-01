@@ -5,9 +5,9 @@ import lombok.Data;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserDto {
+public class RestaurantDto {
     private Long id;
     private String name;
-    private String username;
-    private String passwordHash;
+    private String location;
+    private String imageUrl;
 }

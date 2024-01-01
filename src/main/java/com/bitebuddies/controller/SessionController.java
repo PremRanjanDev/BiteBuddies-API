@@ -1,7 +1,6 @@
 package com.bitebuddies.controller;
 
 import com.bitebuddies.dto.SessionDto;
-import com.bitebuddies.dto.UserDto;
 import com.bitebuddies.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +44,10 @@ public class SessionController {
         return sessionService.invite(id, userIds);
     }
 
-
-
+//    @PutMapping("/{id}/add-restaurant")
+//    public SessionDto addRestaurant(@PathVariable Long id, @RequestBody RestaurantDto restaurantDto) {
+////        return sessionService.addRestaurant(id, restaurantDto);
+//    }
 
     @DeleteMapping("/{id}")
     public void deleteSession(@PathVariable Long id) {

@@ -1,4 +1,4 @@
-INSERT INTO restaurants (id, name, location, imageUrl) values
+INSERT INTO restaurants (id, name, location, image_url) values
 (1, 'Burger Buddies', '1 Cantonment Rd, #01-01, Singapore 080001', 'https://lh3.googleusercontent.com/p/AF1QipPffCwljlqVeOqvRfA16lEQ7LE4XYYDlQK-F-4R=s1360-w1360-h1020'),
 (2, 'Fork n Spoon Restaurant', '13 Siglap Rd, Mandarin Gardens, Singapore 448911', 'https://lh5.googleusercontent.com/p/AF1QipNal24_u46oGaZeulxqObhV7StUANV7gr8M_JHY=w408-h306-k-no'),
 (3, 'BPS.Cafe at East Coast Park', '1110 ECP, Singapore 449880', 'https://lh5.googleusercontent.com/p/AF1QipMemdm6EIqhH_7qG3MB6uJgS967GGLzFHYWEFuG=w408-h272-k-no'),
@@ -28,4 +28,11 @@ INSERT INTO session_users (session_id, user_id, status) values
 (1, 3, 'invited'),
 (2, 2, 'invited'),
 (2, 1, 'joined');
+
+INSERT INTO session_restaurants (session_id, restaurant_id, submitted_by) values
+(1, 1, 1),
+(1, 2, 2),
+(1, 3, 4),
+(2, 2, 5),
+(2, 1, 6);
 

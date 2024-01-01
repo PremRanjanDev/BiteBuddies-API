@@ -7,15 +7,14 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.Collection;
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "passwordHash", ignore = true)
-    UserDto map(UserEntity entity);
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "passwordHash", ignore = true)
+    UserDto map(UserEntity entity);
+
     Collection<UserDto> map(Collection<UserEntity> entities);
 
     @Mapping(target = "id", ignore = true)

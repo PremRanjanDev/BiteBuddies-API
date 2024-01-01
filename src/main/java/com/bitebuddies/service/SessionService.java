@@ -1,12 +1,14 @@
 package com.bitebuddies.service;
 
-import com.bitebuddies.dao.SessionUserEntity;
 import com.bitebuddies.dto.SessionDto;
 import com.bitebuddies.exception.InvalidRequestException;
 import com.bitebuddies.exception.ResourceNotFoundException;
 import com.bitebuddies.mapper.SessionMapper;
+import com.bitebuddies.mapper.SessionRestaurantMapper;
+import com.bitebuddies.mapper.SessionUserMapper;
 import com.bitebuddies.model.InviteStatus;
 import com.bitebuddies.repository.SessionRepository;
+import com.bitebuddies.repository.SessionRestaurantRepository;
 import com.bitebuddies.repository.SessionUserRepository;
 import com.bitebuddies.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,10 +29,17 @@ public class SessionService {
     private SessionMapper sessionMapper;
 
     @Autowired
+    private SessionUserMapper sessionUserMapper;
+    @Autowired
+    private SessionRestaurantMapper sessionRestaurantMapper;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private SessionUserRepository sessionUserRepository;
+    @Autowired
+    private SessionRestaurantRepository sessionRestaurantRepository;
 
     public Collection<SessionDto> getActiveSessions() {
         log.info("getActiveSessions");
@@ -40,13 +48,17 @@ public class SessionService {
 
     public Collection<SessionDto> getAllSessions() {
         log.info("getAllSessions");
-        sessionUserRepository.findAll();
         return sessionMapper.map(sessionRepo.findAll());
     }
 
     public SessionDto getSession(Long id) {
         log.info("getSession : {}", id);
-        return sessionMapper.map(sessionRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Session not found")));
+        var session = sessionMapper.map(sessionRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Session not found")));
+        var users = sessionUserRepository.findAllBySessionId(session.getId());
+        session.setSessionUsers(sessionUserMapper.map(users));
+        var restaurants = sessionRestaurantRepository.findAllBySessionId(session.getId());
+        session.setSessionRestaurant(sessionRestaurantMapper.map(restaurants));
+        return session;
     }
 
     public SessionDto createSession(SessionDto req) {
@@ -73,12 +85,12 @@ public class SessionService {
         log.info("Session found: {}", sessionInDb.getName());
         var users = userRepository.findAllById(userIds);
         log.info("Total users found: {}", users.size());
-        var invitees = users
-                .stream()
-                .map(user -> new SessionUserEntity(sessionInDb, user, InviteStatus.invited))
-                .collect(Collectors.toSet());
-        var invited = sessionUserRepository.saveAll(invitees);
-        log.info("Users invited: {}", invited.size());
+//        var invitees = users
+//                .stream()
+//                .map(user -> new SessionUserEntity(sessionInDb, user, InviteStatus.invited))
+//                .collect(Collectors.toSet());
+//        var invited = sessionUserRepository.saveAll(invitees);
+//        log.info("Users invited: {}", invited.size());
         return sessionMapper.map(sessionRepo.findById(sessionInDb.getId()).get());
     }
 
@@ -97,4 +109,8 @@ public class SessionService {
         log.info("Users joined: {}", joined.getJoinedAt());
         return sessionMapper.map(sessionRepo.findById(session.getId()).get());
     }
+
+//    public SessionDto addRestaurant(Long id, RestaurantDto restaurantDto) {
+//
+//    }
 }

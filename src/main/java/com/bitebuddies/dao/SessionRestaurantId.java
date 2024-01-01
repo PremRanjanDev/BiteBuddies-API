@@ -8,12 +8,12 @@ import java.io.Serializable;
 
 @Data
 @Embeddable
-public class SessionUserId implements Serializable {
+public class SessionRestaurantId implements Serializable {
 
     @Column(name = "session_id")
     private Long sessionId;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "restaurant_id")
+    private Long restaurantId;
 
 }
