@@ -22,8 +22,10 @@ public class SessionEntity {
     private String name;
     private String description;
     private LocalDateTime startsAt;
-    @ManyToOne
-    @JoinColumn(name = "initiated_by", nullable = false)
+    @Column(name = "initiated_by")
+    private Long initiatedByUserId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "initiated_by", nullable = false, insertable = false, updatable = false)
     private UserEntity initiatedBy;
     private Long pickedRestaurantId;
     private boolean active;

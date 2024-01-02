@@ -5,7 +5,7 @@ import com.bitebuddies.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -18,8 +18,13 @@ public class UserController {
         return userService.login(loginUser);
     }
 
+    @PostMapping("/sign-up")
+    public UserDto signUp(@RequestBody UserDto loginUser) {
+        return userService.signUp(loginUser);
+    }
+
     @GetMapping("/all")
-    public Collection<UserDto> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return userService.getAllUsers();
     }
 }

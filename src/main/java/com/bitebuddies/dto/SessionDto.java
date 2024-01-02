@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -13,11 +13,12 @@ public class SessionDto {
     private String name;
     private String description;
     private LocalDateTime startsAt;
+    private Long initiatedByUserId;
     private UserDto initiatedBy;
     private Long pickedRestaurantId;
     private boolean active;
-    private Set<SessionUserDto> sessionUsers;
-    private Set<SessionRestaurantDto> sessionRestaurant;
+    private List<SessionUserDto> sessionUsers;
+    private List<SessionRestaurantDto> sessionRestaurant;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

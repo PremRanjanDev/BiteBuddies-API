@@ -5,13 +5,13 @@ import com.bitebuddies.dto.SessionRestaurantDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.Set;
+import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {SessionMapper.class, RestaurantMapper.class})
 public interface SessionRestaurantMapper {
-    @Mapping(target = "sessionId", source = "session.id")
+    @Mapping(target = "sessionId", source = "id.sessionId")
     @Mapping(target = "submittedByUserId", source = "submittedBy")
     SessionRestaurantDto map(SessionRestaurantEntity entity);
 
-    Set<SessionRestaurantDto> map(Set<SessionRestaurantEntity> entities);
+    List<SessionRestaurantDto> map(List<SessionRestaurantEntity> entities);
 }

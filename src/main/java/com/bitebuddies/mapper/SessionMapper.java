@@ -2,12 +2,9 @@ package com.bitebuddies.mapper;
 
 import com.bitebuddies.dao.SessionEntity;
 import com.bitebuddies.dto.SessionDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
-import java.util.Collection;
+import java.util.List;
 
 @Mapper(componentModel = "spring",
         uses = {UserMapper.class, SessionUserMapper.class},
@@ -17,18 +14,18 @@ public interface SessionMapper {
     @Mapping(target = "initiatedBy.passwordHash", ignore = true)
     SessionDto map(SessionEntity entity);
 
-    Collection<SessionDto> map(Collection<SessionEntity> entities);
+    List<SessionDto> map(List<SessionEntity> entities);
 
+    @Named("mapForCreate")
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "initiatedBy", ignore = true)
     @Mapping(target = "pickedRestaurantId", ignore = true)
     @Mapping(target = "active", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     SessionEntity mapForCreate(SessionDto req);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "initiatedBy", ignore = true)
+    @InheritConfiguration(name = "mapForCreate")
+    @Mapping(target = "initiatedByUserId", ignore = true)
     void mapForUpdate(@MappingTarget SessionEntity entity, SessionDto req);
 }

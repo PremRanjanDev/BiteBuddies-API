@@ -15,5 +15,4 @@ public class SessionUserId implements Serializable {
 
     @Column(name = "user_id")
     private Long userId;
-
 }

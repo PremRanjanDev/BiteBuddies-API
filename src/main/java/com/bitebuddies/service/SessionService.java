@@ -1,22 +1,27 @@
 package com.bitebuddies.service;
 
+import com.bitebuddies.dao.SessionRestaurantEntity;
+import com.bitebuddies.dao.SessionUserEntity;
+import com.bitebuddies.dto.RestaurantDto;
 import com.bitebuddies.dto.SessionDto;
 import com.bitebuddies.exception.InvalidRequestException;
 import com.bitebuddies.exception.ResourceNotFoundException;
+import com.bitebuddies.mapper.RestaurantMapper;
 import com.bitebuddies.mapper.SessionMapper;
 import com.bitebuddies.mapper.SessionRestaurantMapper;
 import com.bitebuddies.mapper.SessionUserMapper;
 import com.bitebuddies.model.InviteStatus;
+import com.bitebuddies.repository.RestaurantRepository;
 import com.bitebuddies.repository.SessionRepository;
 import com.bitebuddies.repository.SessionRestaurantRepository;
 import com.bitebuddies.repository.SessionUserRepository;
-import com.bitebuddies.repository.UserRepository;
+import com.bitebuddies.util.Utility;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,24 +34,31 @@ public class SessionService {
     private SessionMapper sessionMapper;
 
     @Autowired
+    private RestaurantMapper restaurantMapper;
+
+    @Autowired
     private SessionUserMapper sessionUserMapper;
+
     @Autowired
     private SessionRestaurantMapper sessionRestaurantMapper;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private SessionUserRepository sessionUserRepository;
+    private SessionUserRepository sessionUserRepo;
     @Autowired
-    private SessionRestaurantRepository sessionRestaurantRepository;
+    private SessionRestaurantRepository sessionRestaurantRepo;
 
-    public Collection<SessionDto> getActiveSessions() {
+    @Autowired
+    private RestaurantRepository restaurantRepo;
+
+    public List<SessionDto> getActiveSessions() {
         log.info("getActiveSessions");
         return sessionMapper.map(sessionRepo.findByActive(true));
     }
 
-    public Collection<SessionDto> getAllSessions() {
+    public List<SessionDto> getAllSessions() {
         log.info("getAllSessions");
         return sessionMapper.map(sessionRepo.findAll());
     }
@@ -54,9 +66,9 @@ public class SessionService {
     public SessionDto getSession(Long id) {
         log.info("getSession : {}", id);
         var session = sessionMapper.map(sessionRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Session not found")));
-        var users = sessionUserRepository.findAllBySessionId(session.getId());
+        var users = sessionUserRepo.findAllBySessionId(session.getId());
         session.setSessionUsers(sessionUserMapper.map(users));
-        var restaurants = sessionRestaurantRepository.findAllBySessionId(session.getId());
+        var restaurants = sessionRestaurantRepo.findAllBySessionId(session.getId());
         session.setSessionRestaurant(sessionRestaurantMapper.map(restaurants));
         return session;
     }
@@ -81,36 +93,53 @@ public class SessionService {
 
     public SessionDto invite(Long sessionId, List<Long> userIds) {
         log.info("invite : sessionId {}, userIds {}", sessionId, userIds);
-        var sessionInDb = sessionRepo.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException("Session not found"));
-        log.info("Session found: {}", sessionInDb.getName());
-        var users = userRepository.findAllById(userIds);
-        log.info("Total users found: {}", users.size());
-//        var invitees = users
-//                .stream()
-//                .map(user -> new SessionUserEntity(sessionInDb, user, InviteStatus.invited))
-//                .collect(Collectors.toSet());
-//        var invited = sessionUserRepository.saveAll(invitees);
-//        log.info("Users invited: {}", invited.size());
-        return sessionMapper.map(sessionRepo.findById(sessionInDb.getId()).get());
+        var sessionUsers = userIds.stream()
+                .map(userId -> new SessionUserEntity(sessionId, userId, InviteStatus.invited))
+                .collect(Collectors.toList());
+        sessionUserRepo.saveAll(sessionUsers);
+        return getSession(sessionId);
     }
 
     public SessionDto join(Long sessionId, Long userId) {
         log.info("join : sessionId {}, userId {}", sessionId, userId);
-        var session = sessionRepo.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException("Session not found"));
-        log.info("Session found: {}", session.getName());
-        var user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        log.info("Users found: {}", user.getUsername());
-        var invitee = sessionUserRepository.findBySessionIdAndUserId(session.getId(), user.getId()).orElseThrow(() -> new ResourceNotFoundException("User not invited for the session"));
-        if (InviteStatus.joined.equals(invitee.getStatus())) {
+        var invite = sessionUserRepo.findBySessionIdAndUserId(sessionId, userId).orElseThrow(() -> new ResourceNotFoundException("User not invited for the session"));
+        if (InviteStatus.joined.equals(invite.getStatus())) {
             throw new InvalidRequestException("User already joined");
         }
-        invitee.setStatus(InviteStatus.joined);
-        var joined = sessionUserRepository.save(invitee);
+        invite.setStatus(InviteStatus.joined);
+        var joined = sessionUserRepo.save(invite);
         log.info("Users joined: {}", joined.getJoinedAt());
-        return sessionMapper.map(sessionRepo.findById(session.getId()).get());
+        return getSession(sessionId);
     }
 
-//    public SessionDto addRestaurant(Long id, RestaurantDto restaurantDto) {
-//
-//    }
+    public SessionDto addRestaurant(Long sessionId, RestaurantDto restaurantDto, Long requesterId) {
+        log.info("addRestaurant : sessionId {}", sessionId);
+        var invite = sessionUserRepo.findBySessionIdAndUserId(sessionId, requesterId).orElseThrow(() -> new ResourceNotFoundException("User not invited for the session"));
+        if (!InviteStatus.joined.equals(invite.getStatus())) {
+            throw new InvalidRequestException("User not joined for the session");
+        }
+        var restaurant = restaurantDto.getId() == null
+                ? restaurantRepo.save(restaurantMapper.mapForCreate(restaurantDto))
+                : restaurantRepo.findById(restaurantDto.getId()).get();
+
+        sessionRestaurantRepo.save(new SessionRestaurantEntity(sessionId, restaurant.getId(), requesterId));
+
+        log.info("Restaurant added : {}", restaurant.getId());
+        return getSession(sessionId);
+    }
+
+    public SessionDto endSession(Long sessionId, Long requesterId) {
+        log.info("endSession : sessionId {}", sessionId);
+        var session = sessionRepo.findById(sessionId).orElseThrow(() -> new ResourceNotFoundException("Session not found"));
+        if (!session.getInitiatedBy().getId().equals(requesterId)) {
+            throw new InvalidRequestException("User not allowed to ent this session");
+        }
+        var sessionRestaurants = sessionRestaurantRepo.findAllBySessionId(session.getId());
+        int randomIndex = Utility.generateRandomInt(0, sessionRestaurants.size() - 1);
+        session.setPickedRestaurantId(sessionRestaurants.get(randomIndex).getRestaurant().getId());
+        session.setActive(false);
+        sessionRepo.save(session);
+        log.info("Session end");
+        return getSession(sessionId);
+    }
 }
