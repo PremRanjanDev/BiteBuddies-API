@@ -1,8 +1,6 @@
 package com.bitebuddies.service;
 
-import com.bitebuddies.dao.SessionRestaurantEntity;
 import com.bitebuddies.dao.SessionUserEntity;
-import com.bitebuddies.dto.RestaurantDto;
 import com.bitebuddies.dto.SessionDto;
 import com.bitebuddies.exception.InvalidRequestException;
 import com.bitebuddies.exception.ResourceNotFoundException;
@@ -109,22 +107,6 @@ public class SessionService {
         invite.setStatus(InviteStatus.joined);
         var joined = sessionUserRepo.save(invite);
         log.info("Users joined: {}", joined.getJoinedAt());
-        return getSession(sessionId);
-    }
-
-    public SessionDto addRestaurant(Long sessionId, RestaurantDto restaurantDto, Long requesterId) {
-        log.info("addRestaurant : sessionId {}", sessionId);
-        var invite = sessionUserRepo.findBySessionIdAndUserId(sessionId, requesterId).orElseThrow(() -> new ResourceNotFoundException("User not invited for the session"));
-        if (!InviteStatus.joined.equals(invite.getStatus())) {
-            throw new InvalidRequestException("User not joined for the session");
-        }
-        var restaurant = restaurantDto.getId() == null
-                ? restaurantRepo.save(restaurantMapper.mapForCreate(restaurantDto))
-                : restaurantRepo.findById(restaurantDto.getId()).get();
-
-        sessionRestaurantRepo.save(new SessionRestaurantEntity(sessionId, restaurant.getId(), requesterId));
-
-        log.info("Restaurant added : {}", restaurant.getId());
         return getSession(sessionId);
     }
 

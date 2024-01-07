@@ -11,7 +11,7 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SessionMapper {
     @Mapping(target = "initiatedBy.username", ignore = true)
-    @Mapping(target = "initiatedBy.passwordHash", ignore = true)
+//    @Mapping(target = "initiatedBy.passwordHash", ignore = true)
     SessionDto map(SessionEntity entity);
 
     List<SessionDto> map(List<SessionEntity> entities);

@@ -1,16 +1,16 @@
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(64) NOT NULL,
+  username VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE restaurants (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) UNIQUE,
   url VARCHAR(512),
   location VARCHAR(255),
   image_url VARCHAR(255)
-);
-
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(64) NOT NULL,
-  username VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE sessions (

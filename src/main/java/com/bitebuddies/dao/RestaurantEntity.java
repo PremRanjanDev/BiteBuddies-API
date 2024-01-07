@@ -13,4 +13,5 @@ public class RestaurantEntity {
     private String name;
     private String location;
     private String imageUrl;
+    private String url;
 }

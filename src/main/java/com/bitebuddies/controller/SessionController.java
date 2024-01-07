@@ -1,6 +1,5 @@
 package com.bitebuddies.controller;
 
-import com.bitebuddies.dto.RestaurantDto;
 import com.bitebuddies.dto.SessionDto;
 import com.bitebuddies.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +50,8 @@ public class SessionController {
     }
 
     @PutMapping("/{id}/join")
-    public SessionDto join(@PathVariable Long id, @RequestBody Long userId) {
-        return sessionService.join(id, userId);
-    }
-
-    @PutMapping("/{id}/add-restaurant")
-    public SessionDto addRestaurant(@PathVariable Long id, @RequestBody RestaurantDto restaurantDto, @RequestParam Long requesterId) {
-        return sessionService.addRestaurant(id, restaurantDto, requesterId);
+    public SessionDto join(@PathVariable Long id, @RequestParam Long requesterId) {
+        return sessionService.join(id, requesterId);
     }
 
     @PutMapping("/{id}/end")

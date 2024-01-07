@@ -6,11 +6,17 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
-public class Cypher {
+public final class Cypher {
 
     private static final String secretKeyString = "this-is-dummy-secret-key";
     private static final SecretKey secretKey = new SecretKeySpec(secretKeyString.getBytes(), "AES");
 
+    /**
+     * Encrypt password
+     *
+     * @param plaintext
+     * @return
+     */
     public static String encrypt(String plaintext) {
         try {
             Cipher cipher = Cipher.getInstance("AES");
